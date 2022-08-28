@@ -32,10 +32,11 @@ func main() {
 
 	log.Printf("Attempt to re-acquire %d device(s):\n", len(locations))
 	for _, location := range locations {
-		if _, err := goupnp.DeviceByURL(location); err != nil {
+		if rootDevice, err := goupnp.DeviceByURL(location); err != nil {
 			log.Fatalf("  Failed to reacquire device at %s: %v\n", location.String(), err)
 		} else {
-			log.Printf("  Successfully reacquired device at %s\n", location.String())
+			log.Printf("  Successfully reacquired device at %s:\n", location.String())
+			log.Printf("    %s\n", rootDevice.Device.String())
 		}
 	}
 
