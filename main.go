@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/url"
 
+	"github.com/firescry/purematter/appliance"
+
 	"github.com/huin/goupnp"
 )
 
@@ -20,24 +22,28 @@ func main() {
 	}
 
 	locations := make([]*url.URL, 0, len(maybeRootDevices))
-	log.Printf("Found %d device(s):\n", len(maybeRootDevices))
 	for _, maybeRootDevice := range maybeRootDevices {
 		if maybeRootDevice.Err != nil {
 			log.Fatalf("  Failed to probe device at %s\n", maybeRootDevice.Location.String())
 		} else {
 			locations = append(locations, maybeRootDevice.Location)
-			log.Printf("  Successfully probed device at %s\n", maybeRootDevice.Location.String())
 		}
 	}
 
-	log.Printf("Attempt to re-acquire %d device(s):\n", len(locations))
+	appliances := make([]*appliance.Appliance, 0, len(maybeRootDevices))
 	for _, location := range locations {
 		if rootDevice, err := goupnp.DeviceByURL(location); err != nil {
-			log.Fatalf("  Failed to reacquire device at %s: %v\n", location.String(), err)
+			log.Fatalf("Failed to reacquire device at %s: %v\n", location.String(), err)
 		} else {
-			log.Printf("  Successfully reacquired device at %s:\n", location.String())
-			log.Printf("    %s\n", rootDevice.Device.String())
+			appliances = append(appliances, appliance.NewAppliance(*rootDevice))
 		}
 	}
 
+	log.Printf("Found %d device(s):\n", len(appliances))
+	for _, appliance := range appliances {
+		log.Printf("  Manufacturer: %s\n", appliance.Manufacturer)
+		log.Printf("  Name: %s\n", appliance.ModelName)
+		log.Printf("  Number: %s\n", appliance.ModelNumber)
+		log.Printf("---\n")
+	}
 }
