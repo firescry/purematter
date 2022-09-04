@@ -2,11 +2,9 @@ package client
 
 import "net/url"
 
-var (
-	DefaultEndpoints = map[string]string{
-		"security": "http://0.0.0.0/di/v1/products/0/security",
-	}
-)
+var DefaultEndpoints = map[string]string{
+	"security": "http://0.0.0.0/di/v1/products/0/security",
+}
 
 func GenerateEndpoints(host string) (*map[string]string, error) {
 	endpoints := map[string]string{}
