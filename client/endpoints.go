@@ -6,7 +6,7 @@ var DefaultEndpoints = map[string]string{
 	"security": "http://0.0.0.0/di/v1/products/0/security",
 }
 
-func GenerateEndpoints(host string) (*map[string]string, error) {
+func GenerateEndpoints(host string) (map[string]string, error) {
 	endpoints := map[string]string{}
 	for endpoint, url := range DefaultEndpoints {
 		newUrl, err := UpdateEndpointHost(host, url)
@@ -15,7 +15,7 @@ func GenerateEndpoints(host string) (*map[string]string, error) {
 		}
 		endpoints[endpoint] = newUrl
 	}
-	return &endpoints, nil
+	return endpoints, nil
 }
 
 func UpdateEndpointHost(host, endpoint string) (string, error) {

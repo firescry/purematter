@@ -14,7 +14,7 @@ type Appliance struct {
 	ModelNumber  string
 	UUID         string
 
-	endpoints *map[string]string
+	endpoints map[string]string
 }
 
 func NewAppliance(dev goupnp.RootDevice) *Appliance {
@@ -24,7 +24,7 @@ func NewAppliance(dev goupnp.RootDevice) *Appliance {
 		log.Fatal(err)
 	}
 
-	return &Appliance{
+	appliance := Appliance{
 		Manufacturer: dev.Device.Manufacturer,
 		ModelName:    dev.Device.ModelName,
 		ModelNumber:  dev.Device.ModelNumber,
@@ -32,4 +32,6 @@ func NewAppliance(dev goupnp.RootDevice) *Appliance {
 
 		endpoints: endpoints,
 	}
+
+	return &appliance
 }
