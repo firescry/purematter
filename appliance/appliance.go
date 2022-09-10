@@ -1,8 +1,6 @@
 package appliance
 
 import (
-	"log"
-
 	"github.com/firescry/purematter/client"
 
 	"github.com/huin/goupnp"
@@ -19,12 +17,9 @@ type Appliance struct {
 
 func NewAppliance(dev goupnp.RootDevice) *Appliance {
 	host := dev.URLBase.Hostname()
-	endpoints, err := client.GenerateEndpoints(host)
-	if err != nil {
-		log.Fatal(err)
-	}
+	endpoints, _ := client.GenerateEndpoints(host)
 
-	appliance := Appliance{
+	return &Appliance{
 		Manufacturer: dev.Device.Manufacturer,
 		ModelName:    dev.Device.ModelName,
 		ModelNumber:  dev.Device.ModelNumber,
@@ -32,6 +27,4 @@ func NewAppliance(dev goupnp.RootDevice) *Appliance {
 
 		endpoints: endpoints,
 	}
-
-	return &appliance
 }
