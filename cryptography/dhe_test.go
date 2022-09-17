@@ -1,4 +1,4 @@
-package dhe
+package cryptography
 
 import (
 	"math/big"
