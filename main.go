@@ -45,5 +45,7 @@ func main() {
 		log.Printf("  Name: %s\n", appliance.ModelName)
 		log.Printf("  Number: %s\n", appliance.ModelNumber)
 		log.Printf("---\n")
+
+		appliance.InitConnection()
 	}
 }

@@ -1,28 +1,33 @@
 package client
 
-import "net/url"
+import (
+	"io"
+	"net/url"
+)
 
-var DefaultEndpoints = map[string]string{
-	"security": "http://0.0.0.0/di/v1/products/0/security",
+type ApiEndpoint struct {
+	ApiUrl string
 }
 
-func GenerateEndpoints(host string) (map[string]string, error) {
-	endpoints := map[string]string{}
-	for endpoint, url := range DefaultEndpoints {
-		newUrl, err := UpdateEndpointHost(host, url)
-		if err != nil {
-			return nil, err
-		}
-		endpoints[endpoint] = newUrl
-	}
-	return endpoints, nil
-}
-
-func UpdateEndpointHost(host, endpoint string) (string, error) {
-	e, err := url.Parse(endpoint)
+func NewApiEndpoint(template, host string) *ApiEndpoint {
+	u, err := url.Parse(template)
 	if err != nil {
-		return "", err
+		panic(err)
 	}
-	e.Host = host
-	return e.String(), nil
+	u.Host = host
+	return &ApiEndpoint{
+		ApiUrl: u.String(),
+	}
+}
+
+func (e *ApiEndpoint) Put(contentType string, body io.Reader) []byte {
+	resp, _ := Put(e.ApiUrl, contentType, body)
+	data, _ := ReadResponse(resp)
+	return data
+}
+
+func (e *ApiEndpoint) Get() []byte {
+	resp, _ := DefaultClient.Get(e.ApiUrl)
+	data, _ := ReadResponse(resp)
+	return data
 }
