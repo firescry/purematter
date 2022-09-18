@@ -22,6 +22,7 @@ type Appliance struct {
 	FirmwareApi *client.ApiEndpoint
 	UserinfoApi *client.ApiEndpoint
 	WifiApi     *client.ApiEndpoint
+	DeviceApi   *client.ApiEndpoint
 }
 
 func NewAppliance(dev goupnp.RootDevice) *Appliance {
@@ -38,6 +39,7 @@ func NewAppliance(dev goupnp.RootDevice) *Appliance {
 		FirmwareApi: NewFirmwareApi(host),
 		UserinfoApi: NewUserinfoApi(host),
 		WifiApi:     NewWifiApi(host),
+		DeviceApi:   NewDeviceApi(host),
 	}
 }
 
@@ -80,4 +82,9 @@ func (a *Appliance) InitConnection() {
 	wfEncrypted, _ := base64.StdEncoding.DecodeString(string(wfEncoded))
 	wf := crypter.Decrypt(wfEncrypted)
 	log.Printf("%s", wf)
+
+	dvEncoded := a.DeviceApi.Get()
+	dvEncrypted, _ := base64.StdEncoding.DecodeString(string(dvEncoded))
+	dv := crypter.Decrypt(dvEncrypted)
+	log.Printf("%s", dv)
 }
