@@ -65,6 +65,11 @@ func (a *Appliance) InitConnection() {
 	key = key[:16]
 	crypter := cryptography.NewCrypter(key)
 
+	secEncoded := a.SecurityApi.Get()
+	secEncrypted, _ := base64.StdEncoding.DecodeString(string(secEncoded))
+	sec := crypter.Decrypt(secEncrypted)
+	log.Printf("%s", sec)
+
 	airEncoded := a.AirApi.Get()
 	airEncrypted, _ := base64.StdEncoding.DecodeString(string(airEncoded))
 	air := crypter.Decrypt(airEncrypted)
