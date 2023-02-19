@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/firescry/purematter/appliance"
+	"github.com/firescry/purematter/gui"
 
 	"github.com/huin/goupnp"
 )
@@ -48,4 +49,6 @@ func main() {
 
 		appliance.InitConnection()
 	}
+
+	gui.Start()
 }
