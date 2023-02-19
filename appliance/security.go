@@ -39,7 +39,10 @@ func GetSecurityRequest(intermediate *big.Int) []byte {
 
 func ParseKeyExResponse(data []byte) (*big.Int, *big.Int) {
 	r := Security{}
-	json.Unmarshal(data, &r)
+	err := json.Unmarshal(data, &r)
+	if err != nil {
+		panic(err)
+	}
 	inter := client.HexToBigInt(r.Hellman)
 	key := client.HexToBigInt(r.Key)
 	return inter, key
