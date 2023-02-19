@@ -68,35 +68,35 @@ func (a *Appliance) InitConnection() {
 	secEncoded := a.SecurityApi.Get()
 	secEncrypted, _ := base64.StdEncoding.DecodeString(string(secEncoded))
 	sec := crypter.Decrypt(secEncrypted)
-	log.Printf("%s", sec)
+	log.Printf("%s", sec[2:])
 
 	airEncoded := a.AirApi.Get()
 	airEncrypted, _ := base64.StdEncoding.DecodeString(string(airEncoded))
 	air := crypter.Decrypt(airEncrypted)
-	log.Printf("%s", air)
+	log.Printf("%s", air[2:])
 
 	fwEncoded := a.FirmwareApi.Get()
 	fwEncrypted, _ := base64.StdEncoding.DecodeString(string(fwEncoded))
 	fw := crypter.Decrypt(fwEncrypted)
-	log.Printf("%s", fw)
+	log.Printf("%s", fw[2:])
 
 	uiEncoded := a.UserinfoApi.Get()
 	uiEncrypted, _ := base64.StdEncoding.DecodeString(string(uiEncoded))
 	ui := crypter.Decrypt(uiEncrypted)
-	log.Printf("%s", ui)
+	log.Printf("%s", ui[2:])
 
 	wfEncoded := a.WifiApi.Get()
 	wfEncrypted, _ := base64.StdEncoding.DecodeString(string(wfEncoded))
 	wf := crypter.Decrypt(wfEncrypted)
-	log.Printf("%s", wf)
+	log.Printf("%s", wf[2:])
 
 	dvEncoded := a.DeviceApi.Get()
 	dvEncrypted, _ := base64.StdEncoding.DecodeString(string(dvEncoded))
 	dv := crypter.Decrypt(dvEncrypted)
-	log.Printf("%s", dv)
+	log.Printf("%s", dv[2:])
 
 	frEncoded := a.FilterApi.Get()
 	frEncrypted, _ := base64.StdEncoding.DecodeString(string(frEncoded))
 	fr := crypter.Decrypt(frEncrypted)
-	log.Printf("%s", fr)
+	log.Printf("%s", fr[2:])
 }
