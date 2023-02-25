@@ -7,31 +7,33 @@ import (
 
 	"github.com/firescry/purematter/client"
 	"github.com/firescry/purematter/cryptography"
-
-	"github.com/huin/goupnp"
 )
 
-type Appliance struct {
-	SecurityApi *client.ApiEndpoint
-	AirApi      *client.ApiEndpoint
-	FirmwareApi *client.ApiEndpoint
-	UserinfoApi *client.ApiEndpoint
-	WifiApi     *client.ApiEndpoint
-	DeviceApi   *client.ApiEndpoint
-	FilterApi   *client.ApiEndpoint
+var epTemplates = map[string]string{
+	"air":      "http://0.0.0.0/di/v1/products/1/air",
+	"device":   "http://0.0.0.0/di/v1/products/1/device",
+	"fltsts":   "http://0.0.0.0/di/v1/products/1/fltsts",
+	"firmware": "http://0.0.0.0/di/v1/products/0/firmware",
+	"security": "http://0.0.0.0/di/v1/products/0/security",
+	"userinfo": "http://0.0.0.0/di/v1/products/0/userinfo",
+	"wifi":     "http://0.0.0.0/di/v1/products/0/wifi",
 }
 
-func NewAppliance(dev goupnp.RootDevice) *Appliance {
-	host := dev.URLBase.Hostname()
+type Appliance struct {
+	ep map[string]client.ApiEndpoint
+}
 
-	return &Appliance{
-		SecurityApi: NewSecurityApi(host),
-		AirApi:      NewAirApi(host),
-		FirmwareApi: NewFirmwareApi(host),
-		UserinfoApi: NewUserinfoApi(host),
-		WifiApi:     NewWifiApi(host),
-		DeviceApi:   NewDeviceApi(host),
-		FilterApi:   NewFilterApi(host),
+func NewAppliance() *Appliance {
+	return new(Appliance)
+}
+
+func (a *Appliance) SetHost(host string) {
+	if a.ep == nil {
+		a.ep = make(map[string]client.ApiEndpoint)
+	}
+
+	for name, template := range epTemplates {
+		a.ep[name] = client.NewApiEndpoint(template, host)
 	}
 }
 
@@ -44,7 +46,7 @@ func (a *Appliance) InitConnection() {
 	localInter := dhe.GetIntermediate()
 
 	request := GetSecurityRequest(localInter)
-	body := a.SecurityApi.Put("application/json", bytes.NewReader(request))
+	body := a.ep["security"].Put("application/json", bytes.NewReader(request))
 	foreingInter, encryptedKey := ParseKeyExResponse(body)
 
 	tmpKeyRaw := dhe.GetSharedKey(foreingInter)
@@ -55,37 +57,37 @@ func (a *Appliance) InitConnection() {
 	key = key[:16]
 	crypter := cryptography.NewCrypter(key)
 
-	secEncoded := a.SecurityApi.Get()
+	secEncoded := a.ep["security"].Get()
 	secEncrypted, _ := base64.StdEncoding.DecodeString(string(secEncoded))
 	sec := crypter.Decrypt(secEncrypted)
 	log.Printf("%s", sec[2:])
 
-	airEncoded := a.AirApi.Get()
+	airEncoded := a.ep["air"].Get()
 	airEncrypted, _ := base64.StdEncoding.DecodeString(string(airEncoded))
 	air := crypter.Decrypt(airEncrypted)
 	log.Printf("%s", air[2:])
 
-	fwEncoded := a.FirmwareApi.Get()
+	fwEncoded := a.ep["firmware"].Get()
 	fwEncrypted, _ := base64.StdEncoding.DecodeString(string(fwEncoded))
 	fw := crypter.Decrypt(fwEncrypted)
 	log.Printf("%s", fw[2:])
 
-	uiEncoded := a.UserinfoApi.Get()
+	uiEncoded := a.ep["userinfo"].Get()
 	uiEncrypted, _ := base64.StdEncoding.DecodeString(string(uiEncoded))
 	ui := crypter.Decrypt(uiEncrypted)
 	log.Printf("%s", ui[2:])
 
-	wfEncoded := a.WifiApi.Get()
+	wfEncoded := a.ep["wifi"].Get()
 	wfEncrypted, _ := base64.StdEncoding.DecodeString(string(wfEncoded))
 	wf := crypter.Decrypt(wfEncrypted)
 	log.Printf("%s", wf[2:])
 
-	dvEncoded := a.DeviceApi.Get()
+	dvEncoded := a.ep["device"].Get()
 	dvEncrypted, _ := base64.StdEncoding.DecodeString(string(dvEncoded))
 	dv := crypter.Decrypt(dvEncrypted)
 	log.Printf("%s", dv[2:])
 
-	frEncoded := a.FilterApi.Get()
+	frEncoded := a.ep["fltsts"].Get()
 	frEncrypted, _ := base64.StdEncoding.DecodeString(string(frEncoded))
 	fr := crypter.Decrypt(frEncrypted)
 	log.Printf("%s", fr[2:])

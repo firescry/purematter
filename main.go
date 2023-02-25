@@ -36,7 +36,10 @@ func main() {
 		if rootDevice, err := goupnp.DeviceByURL(location); err != nil {
 			log.Fatalf("Failed to reacquire device at %s: %v\n", location.String(), err)
 		} else {
-			appliances = append(appliances, appliance.NewAppliance(*rootDevice))
+			appliance := appliance.NewAppliance()
+			appliance.SetHost(rootDevice.URLBase.Hostname())
+			appliances = append(appliances, appliance)
+
 		}
 	}
 
