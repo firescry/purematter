@@ -40,13 +40,7 @@ func main() {
 		}
 	}
 
-	log.Printf("Found %d device(s):\n", len(appliances))
 	for _, appliance := range appliances {
-		log.Printf("  Manufacturer: %s\n", appliance.Manufacturer)
-		log.Printf("  Name: %s\n", appliance.ModelName)
-		log.Printf("  Number: %s\n", appliance.ModelNumber)
-		log.Printf("---\n")
-
 		appliance.InitConnection()
 	}
 

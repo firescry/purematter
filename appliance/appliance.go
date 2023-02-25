@@ -12,11 +12,6 @@ import (
 )
 
 type Appliance struct {
-	Manufacturer string
-	ModelName    string
-	ModelNumber  string
-	UUID         string
-
 	SecurityApi *client.ApiEndpoint
 	AirApi      *client.ApiEndpoint
 	FirmwareApi *client.ApiEndpoint
@@ -30,11 +25,6 @@ func NewAppliance(dev goupnp.RootDevice) *Appliance {
 	host := dev.URLBase.Hostname()
 
 	return &Appliance{
-		Manufacturer: dev.Device.Manufacturer,
-		ModelName:    dev.Device.ModelName,
-		ModelNumber:  dev.Device.ModelNumber,
-		UUID:         dev.Device.UDN,
-
 		SecurityApi: NewSecurityApi(host),
 		AirApi:      NewAirApi(host),
 		FirmwareApi: NewFirmwareApi(host),
