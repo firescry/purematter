@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"log"
+	"net/url"
 
 	"github.com/firescry/purematter/client"
 	"github.com/firescry/purematter/cryptography"
@@ -20,7 +21,7 @@ var epTemplates = map[string]string{
 }
 
 type Appliance struct {
-	ep map[string]client.ApiEndpoint
+	ep map[string]string
 }
 
 func NewAppliance() *Appliance {
@@ -29,12 +30,21 @@ func NewAppliance() *Appliance {
 
 func (a *Appliance) SetHost(host string) {
 	if a.ep == nil {
-		a.ep = make(map[string]client.ApiEndpoint)
+		a.ep = make(map[string]string)
 	}
 
 	for name, template := range epTemplates {
-		a.ep[name] = client.NewApiEndpoint(template, host)
+		a.ep[name] = endpoint(template, host)
 	}
+}
+
+func endpoint(template, host string) string {
+	u, err := url.Parse(template)
+	if err != nil {
+		panic(err)
+	}
+	u.Host = host
+	return u.String()
 }
 
 func (a *Appliance) InitConnection() {
@@ -46,7 +56,7 @@ func (a *Appliance) InitConnection() {
 	localInter := dhe.GetIntermediate()
 
 	request := GetSecurityRequest(localInter)
-	body := a.ep["security"].Put("application/json", bytes.NewReader(request))
+	body, _ := client.Put(a.ep["security"], "application/json", bytes.NewReader(request))
 	foreingInter, encryptedKey := ParseKeyExResponse(body)
 
 	tmpKeyRaw := dhe.GetSharedKey(foreingInter)
@@ -57,37 +67,37 @@ func (a *Appliance) InitConnection() {
 	key = key[:16]
 	crypter := cryptography.NewCrypter(key)
 
-	secEncoded := a.ep["security"].Get()
+	secEncoded, _ := client.Get(a.ep["security"])
 	secEncrypted, _ := base64.StdEncoding.DecodeString(string(secEncoded))
 	sec := crypter.Decrypt(secEncrypted)
 	log.Printf("%s", sec[2:])
 
-	airEncoded := a.ep["air"].Get()
+	airEncoded, _ := client.Get(a.ep["air"])
 	airEncrypted, _ := base64.StdEncoding.DecodeString(string(airEncoded))
 	air := crypter.Decrypt(airEncrypted)
 	log.Printf("%s", air[2:])
 
-	fwEncoded := a.ep["firmware"].Get()
+	fwEncoded, _ := client.Get(a.ep["firmware"])
 	fwEncrypted, _ := base64.StdEncoding.DecodeString(string(fwEncoded))
 	fw := crypter.Decrypt(fwEncrypted)
 	log.Printf("%s", fw[2:])
 
-	uiEncoded := a.ep["userinfo"].Get()
+	uiEncoded, _ := client.Get(a.ep["userinfo"])
 	uiEncrypted, _ := base64.StdEncoding.DecodeString(string(uiEncoded))
 	ui := crypter.Decrypt(uiEncrypted)
 	log.Printf("%s", ui[2:])
 
-	wfEncoded := a.ep["wifi"].Get()
+	wfEncoded, _ := client.Get(a.ep["wifi"])
 	wfEncrypted, _ := base64.StdEncoding.DecodeString(string(wfEncoded))
 	wf := crypter.Decrypt(wfEncrypted)
 	log.Printf("%s", wf[2:])
 
-	dvEncoded := a.ep["device"].Get()
+	dvEncoded, _ := client.Get(a.ep["device"])
 	dvEncrypted, _ := base64.StdEncoding.DecodeString(string(dvEncoded))
 	dv := crypter.Decrypt(dvEncrypted)
 	log.Printf("%s", dv[2:])
 
-	frEncoded := a.ep["fltsts"].Get()
+	frEncoded, _ := client.Get(a.ep["fltsts"])
 	frEncrypted, _ := base64.StdEncoding.DecodeString(string(frEncoded))
 	fr := crypter.Decrypt(frEncrypted)
 	log.Printf("%s", fr[2:])

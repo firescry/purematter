@@ -5,26 +5,41 @@ import (
 	"net/http"
 )
 
-var DefaultClient = &http.Client{}
+var c = &http.Client{}
 
-func Put(url, contentType string, body io.Reader) (*http.Response, error) {
+func Put(url string, contentType string, body io.Reader) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodPut, url, body)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", contentType)
-	resp, err := DefaultClient.Do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	return resp, nil
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	d, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return d, nil
 }
 
-func ReadResponse(resp *http.Response) ([]byte, error) {
-	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
+func Get(url string) ([]byte, error) {
+	resp, err := c.Get(url)
 	if err != nil {
 		return nil, err
 	}
-	return data, nil
+	defer resp.Body.Close()
+
+	d, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return d, nil
 }
