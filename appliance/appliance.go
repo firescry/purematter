@@ -48,18 +48,14 @@ func endpoint(template, host string) string {
 }
 
 func (a *Appliance) InitConnection() {
-	secret, _ := cryptography.GenDHESecret(512)
-	dhe := cryptography.NewDHE(
-		client.HexToBigInt(PhilipsDHBase),
-		client.HexToBigInt(PhilipsDHMod),
-		secret)
-	localInter := dhe.GetIntermediate()
+	kex := cryptography.NewKeyExchange()
+	localInter := kex.Public()
 
 	request := GetSecurityRequest(localInter)
 	body, _ := client.Put(a.ep["security"], "application/json", bytes.NewReader(request))
 	foreingInter, encryptedKey := ParseKeyExResponse(body)
 
-	tmpKeyRaw := dhe.GetSharedKey(foreingInter)
+	tmpKeyRaw := kex.Private(foreingInter)
 	tmpKey := tmpKeyRaw.Bytes()[:16]
 
 	tmpCrypter := cryptography.NewCrypter(tmpKey)
