@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
-
-	"github.com/firescry/purematter/client"
 )
 
 type SecurityRequest struct {
@@ -31,7 +29,7 @@ func ParseKeyExResponse(data []byte) (*big.Int, *big.Int) {
 	if err != nil {
 		panic(err)
 	}
-	inter := client.HexToBigInt(r.Hellman)
-	key := client.HexToBigInt(r.Key)
+	inter, _ := new(big.Int).SetString(r.Hellman, 16)
+	key, _ := new(big.Int).SetString(r.Key, 16)
 	return inter, key
 }
