@@ -6,17 +6,14 @@ import (
 	"math/big"
 )
 
-type SecurityRequest struct {
-	Diffie string `json:"diffie"`
-}
-
 type Security struct {
-	Hellman string `json:"hellman"`
-	Key     string `json:"key"`
+	Diffie  string `json:"diffie,omitempty"`
+	Hellman string `json:"hellman,omitempty"`
+	Key     string `json:"key,omitempty"`
 }
 
 func GetSecurityRequest(intermediate *big.Int) []byte {
-	r := SecurityRequest{
+	r := Security{
 		Diffie: fmt.Sprintf("%x", intermediate),
 	}
 	j, _ := json.Marshal(r)
